@@ -14,8 +14,10 @@
 ;; Font
 (set-face-attribute 'default nil :font "Hack NFM" :height 100) ; TODO check if this works?
 
-(load-theme 'tango-dark)
+(load-theme 'wombat)
 
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ;; Packages
 ;; Initialize package sources
@@ -34,3 +36,15 @@
 
 (require 'use-package)
 (setq use-package-always-ensure t)
+
+;; For auto completion in command prompt
+(use-package ivy
+  :bind (:map ivy-minibuffer-map ;; Apply the key bindings after only when in minibuffer map
+	      ("TAB" . ivy-alt-done)
+	      ("C-l" . ivy-alt-done)
+	      ("C-j" . ivy-next-line) ;; vim key binds to select command
+	      ("C-k" . ivy-previous-line))
+  :config
+  (ivy-mode))
+(use-package swiper)
+(use-package counsel)
