@@ -25,9 +25,6 @@
 		eshell-mode-hook))
   (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
-;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
 ;; Packages
 ;; Initialize package sources
 (require 'package) ;; Loads in package manager functionality
@@ -95,4 +92,37 @@
 
 ;; Theme
 (use-package catppuccin-theme
-  :config (load-theme 'catppuccin :no-confirm))
+  :init (load-theme 'catppuccin :no-confirm))
+
+;; Key bindings
+;; global-set-key for global binds
+;; define-key to bind something in a mode
+(use-package general
+  :config
+  (general-create-definer lh/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+  ;; Extra commands after hitting leader key
+  (lh/leader-keys
+   "t" '(:ignore t :which-key "toggles") ;; so which key shows what t stands for
+   "tt" '(counsel-load-theme :which-key "choose theme")))
+
+;; evil for vim
+(use-package evil
+  :init
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1)
+  ;; On line wrapping, don't jump over whole line
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line))
+
+;; useful for vim keybinds in other buffers which make sense
+(use-package evil-collection
+  :after evil ; load after evil has loaded
+  :config
+  (evil-collection-init))
+
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
