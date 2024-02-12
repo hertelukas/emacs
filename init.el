@@ -13,8 +13,17 @@
 
 ;; Font
 (set-face-attribute 'default nil :font "Hack NFM" :height 100) ; TODO check if this works?
-
 (load-theme 'wombat)
+
+;; Line numbers
+(column-number-mode) ;; show column in modeline
+(global-display-line-numbers-mode t)
+
+;; Disable line numbers for some nodes
+(dolist (mode '(org-mode-hook
+		term-mode-hook
+		eshell-mode-hook))
+  (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
