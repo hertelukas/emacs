@@ -118,7 +118,16 @@
     "tc" '(global-display-fill-column-indicator-mode :which-key "Column indicator")
     ;; Quit
     "q" '(:ignore t :which-key "quit")
-    "qq" '(save-buffers-kill-terminal :which-key "Quit emacs")))
+    "qq" '(save-buffers-kill-terminal :which-key "Quit emacs")
+    ;; Window
+    "w" '(:ignore t :which-key "window")
+    "wd" '(evil-window-delete :which-key "evil-window-delete")
+    "ws" '(evil-window-split :which-key "evil-window-split")
+    "wv" '(evil-window-vsplit :which-key "evil-window-vsplit")
+    "ww" '(evil-window-next :which-key "evil-window-next")
+    "wW" '(evil-window-prev :which-key "evil-window-prev")
+    )
+  )
 
 ;; evil for vim
 (use-package evil
