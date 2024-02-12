@@ -124,10 +124,10 @@
     "gg" '(magit :which-key "magit-status")
     ;; org
     "n" '(:ignore t :which-key "org")
-    "na" '(org-agenda :whick-key "Org agenda")
-    "nr" '(:ignore t :whick-key "roam")
+    "na" '(org-agenda :which-key "Org agenda")
+    "nr" '(:ignore t :which-key "roam")
     "nrf" '(org-roam-node-find :which-key "Find node")
-    "nri" '(org-roam-node-insert :whick-key "Insert link")
+    "nri" '(org-roam-node-insert :which-key "Insert link")
     ;; Project
     "p" '(projectile-command-map :which-key "project")
     ;; Toggles
