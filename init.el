@@ -23,7 +23,7 @@
 ;; Initialize package sources
 (require 'package) ;; Loads in package manager functionality
 
-(setq package-archives '(("melpa". "https://melpa.org.packages/")
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
@@ -48,3 +48,8 @@
   (ivy-mode))
 (use-package swiper)
 (use-package counsel)
+
+;; Doom modeline
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
