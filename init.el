@@ -45,7 +45,7 @@
   (package-install 'use-package))
 
 (require 'use-package)
-(setq use-package-always-ensure t)
+(setq use-package-always-ensure t) ;; makes sure we downloaded it when we first use it
 
 ;; For auto completion in command prompt
 (use-package ivy
@@ -57,7 +57,10 @@
   :config
   (ivy-mode))
 (use-package swiper)
-(use-package counsel)
+(use-package counsel
+  :bind (("M-x" . counsel-M-x))
+  :config
+  (setq ivy-initial-inputs-alist nil)) ;; don't start searches with ^
 
 ;; Doom modeline
 (use-package doom-modeline
@@ -74,3 +77,19 @@
   :diminish  which-key-mode
   :config
   (setq which-key-idle-delay 0.2))
+
+;; ivy rich to get detail about commands
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
+
+;; helpful
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
