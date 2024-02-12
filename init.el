@@ -105,8 +105,20 @@
     :global-prefix "C-SPC")
   ;; Extra commands after hitting leader key
   (lh/leader-keys
-   "t" '(:ignore t :which-key "toggles") ;; so which key shows what t stands for
-   "tt" '(counsel-load-theme :which-key "choose theme")))
+    ;; Top level
+    "," '(counsel-switch-buffer :which-key "Switch buffer") ; TODO maybe switch to consult
+    "." '(counsel-find-file :which-key "Find file")
+    ;; File
+    "f" '(:ignore t :which-key "file")
+    "ff" '(counsel-find-file :which-key "Find file")
+    "fs" '(save-buffer :which-key "Save file")
+    "fS" '(write-file :which-key "Save file as...")
+    ;; Toggles
+    "t" '(:ignore t :which-key "toggle")
+    "tc" '(global-display-fill-column-indicator-mode :which-key "Column indicator")
+    ;; Quit
+    "q" '(:ignore t :which-key "quit")
+    "qq" '(save-buffers-kill-terminal :which-key "Quit emacs")))
 
 ;; evil for vim
 (use-package evil
@@ -126,3 +138,5 @@
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+;; TODO maybe look at hydra for cycling commands in a buffer
