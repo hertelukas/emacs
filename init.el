@@ -108,11 +108,13 @@
     ;; Top level
     "," '(counsel-switch-buffer :which-key "Switch buffer") ; TODO maybe switch to consult
     "." '(counsel-find-file :which-key "Find file")
+    "/" '(counsel-projectile-rg :which-key "Search project")
     ;; File
     "f" '(:ignore t :which-key "file")
     "ff" '(counsel-find-file :which-key "Find file")
     "fs" '(save-buffer :which-key "Save file")
     "fS" '(write-file :which-key "Save file as...")
+    "p" '(projectile-command-map :which-key "project")
     ;; Toggles
     "t" '(:ignore t :which-key "toggle")
     "tc" '(global-display-fill-column-indicator-mode :which-key "Column indicator")
@@ -149,3 +151,14 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ;; TODO maybe look at hydra for cycling commands in a buffer
+
+
+;; Projectile to interact with projects
+(use-package projectile
+  :diminish projectile-mode
+  :init
+  (projectile-mode +1)
+  )
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
