@@ -114,6 +114,10 @@
     "ff" '(counsel-find-file :which-key "Find file")
     "fs" '(save-buffer :which-key "Save file")
     "fS" '(write-file :which-key "Save file as...")
+    ;; git
+    "g" '(:ignore t :which-key "git")
+    "gg" '(magit :which-key "magit-status")
+    ;; Project
     "p" '(projectile-command-map :which-key "project")
     ;; Toggles
     "t" '(:ignore t :which-key "toggle")
@@ -162,3 +166,8 @@
 
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
+
+;; magit
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
