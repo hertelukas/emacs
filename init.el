@@ -109,6 +109,11 @@
     "," '(counsel-switch-buffer :which-key "Switch buffer") ; TODO maybe switch to consult
     "." '(counsel-find-file :which-key "Find file")
     "/" '(counsel-projectile-rg :which-key "Search project")
+    ;; Buffer
+    "b" '(:ignore t :which-key "buffer")
+    "bd" '(kill-current-buffer :which-key "Kill buffer")
+    "b[" '(previous-buffer :which-key "Previous buffer")
+    "b]" '(next-buffer :which-key "Next buffer")
     ;; File
     "f" '(:ignore t :which-key "file")
     "ff" '(counsel-find-file :which-key "Find file")
