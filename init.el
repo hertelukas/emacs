@@ -122,6 +122,12 @@
     ;; git
     "g" '(:ignore t :which-key "git")
     "gg" '(magit :which-key "magit-status")
+    ;; org
+    "n" '(:ignore t :which-key "org")
+    "na" '(org-agenda :whick-key "Org agenda")
+    "nr" '(:ignore t :whick-key "roam")
+    "nrf" '(org-roam-node-find :which-key "Find node")
+    "nri" '(org-roam-node-insert :whick-key "Insert link")
     ;; Project
     "p" '(projectile-command-map :which-key "project")
     ;; Toggles
@@ -159,6 +165,8 @@
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+(with-eval-after-load 'evil-maps
+  (define-key evil-motion-state-map (kbd "RET") nil))
 ;; TODO maybe look at hydra for cycling commands in a buffer
 
 
@@ -181,12 +189,23 @@
 (defun lh/org-mode-setup()
   (org-indent-mode)
   (visual-line-mode 1)
-  (setq evil-auto-indent nil))
+  (setq evil-auto-indent nil)
+  (setq org-hide-emphasis-markers t)
+  (setq org-return-follows-link t)
+  (setf (alist-get 'file org-link-frame-setup) #'find-file)
+  )
 
 (use-package org
   :hook (org-mode . lh/org-mode-setup)
   :config
-  (setq org-ellipsis " ▾"))
+  (setq org-ellipsis " ▾")
+
+  ;; agenda
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
+  (setq org-directory "~/org/")
+  (setq org-agenda-files
+	'("~/org/" "~/org/roam/")))
 
 (use-package org-bullets
   :after org
@@ -201,3 +220,32 @@
 
 (use-package visual-fill-column
   :hook (org-mode . efs/org-mode-visual-fill))
+
+;; TODO look at org-wild-notifier
+
+;; Roam
+(use-package org-roam
+  :custom
+  (org-roam-directory "~/org/roam")
+  (org-roam-capture-templates
+   '(("d" "default" plain
+      "%?"
+      :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+title: ${title}\n")
+      :unnarrowed t)
+     ("b" "book notes" plain
+      (file "~/org/roam/templates/book-template.org")
+      :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+title: ${title}\n#+filetags:Book")
+      :unnarrowed t)
+     ("f" "fleeting notes" plain
+      "%?"
+      :target (file+head "fleet-%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+title: ${title}\n#+filetags:Fleeting\n#+date:%U\n")
+      :unnarrowed t)
+     )
+   )
+  :config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode))
