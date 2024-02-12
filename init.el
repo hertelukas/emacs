@@ -13,7 +13,6 @@
 
 ;; Font
 (set-face-attribute 'default nil :font "Hack NFM" :height 100) ; TODO check if this works?
-(load-theme 'wombat)
 
 ;; Line numbers
 (column-number-mode) ;; show column in modeline
@@ -93,3 +92,7 @@
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
+
+;; Theme
+(use-package catppuccin-theme
+  :config (load-theme 'catppuccin :no-confirm))
