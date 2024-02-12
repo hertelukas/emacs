@@ -67,6 +67,11 @@
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook))
+
 ;; which key
 (use-package which-key
   :init (which-key-mode)
@@ -117,6 +122,7 @@
     ;; File
     "f" '(:ignore t :which-key "file")
     "ff" '(counsel-find-file :which-key "Find file")
+    "fr" '(counsel-recentf :which-key "Find recent")
     "fs" '(save-buffer :which-key "Save file")
     "fS" '(write-file :which-key "Save file as...")
     ;; git
