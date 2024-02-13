@@ -5,26 +5,27 @@
 
 #+begin_src emacs-lisp
 
-;; We don't want to see a strartup message
-(setq inhibit-startup-message t)
+  ;; We don't want to see a strartup message
+  (setq inhibit-startup-message t)
 
-(scroll-bar-mode -1) ; Disable visible scroll bar
-(tool-bar-mode -1)   ; Disable the toolbar
-(tooltip-mode -1)    ; Disable tooltips
-(set-fringe-mode 10) ; Give some breathing room
+  (scroll-bar-mode -1) ; Disable visible scroll bar
+  (tool-bar-mode -1)   ; Disable the toolbar
+  (tooltip-mode -1)    ; Disable tooltips
+  (set-fringe-mode 10) ; Give some breathing room
 
-(menu-bar-mode -1)   ; Disable menu bar
+  (menu-bar-mode -1)   ; Disable menu bar
 
-;; Line numbers
-(column-number-mode) ;; show column in modeline
-(global-display-line-numbers-mode t)
+  ;; Line numbers
+  (column-number-mode) ;; show column in modeline
+  (global-display-line-numbers-mode t)
 
-;; Disable line numbers for some nodes
-(dolist (mode '(org-mode-hook
-		term-mode-hook
-		shell-mode-hook
-		eshell-mode-hook))
-  (add-hook mode(lambda () (display-line-numbers-mode 0))))
+  ;; Disable line numbers for some nodes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  treemacs-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
 #+end_src
 
@@ -260,6 +261,15 @@
 
 #+end_src
 
+** Commenting
+
+#+begin_src emacs-lisp
+
+  (use-package evil-nerd-commenter
+  :bind ("C-/" . evilnc-comment-or-uncomment-lines))
+
+#+end_src
+
 ** TODO Hydra
 
 * Org Mode
@@ -372,3 +382,67 @@
 #+end_src
 
 ** TODO org-wild-notifier
+
+* LSP
+
+#+begin_src emacs-lisp
+
+  (defun lh/lsp-mode-setup ()
+    (setq lsp-headerline-breadcrumb-enable nil))
+
+  (use-package lsp-mode
+    :init
+    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    :hook (
+           (lsp-mode . lsp-enable-which-key-integration)
+           (lsp-mode . lh/lsp-mode-setup))
+    :commands (lsp lsp-deferred))
+
+  ;; optionally
+  (use-package lsp-ui :commands lsp-ui-mode)
+  ;; if you are ivy user
+  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+
+  ;; optionally if you want to use debugger
+  (use-package dap-mode)
+  ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+  (use-package lsp-treemacs
+    :after lsp)
+
+  ;; optional if you want which-key integration
+  (use-package which-key
+    :config
+    (which-key-mode))
+
+#+end_src
+
+** TODO Keybindings [/]
+- [ ] ~lsp-treemacs-symbols~
+- [ ] ~lsp-find-declaration~
+
+** Company Mode
+
+#+begin_src emacs-lisp
+
+  (use-package company
+    :after lsp-mode
+    :hook (lsp-mode . company-mode)
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0.0))
+
+#+end_src
+
+** Languages
+
+*** Python
+
+#+begin_src emacs-lisp
+
+  (use-package lsp-pyright
+    :hook (python-mode . (lambda ()
+                            (require 'lsp-pyright)
+                            (lsp-deferred))))  ; or lsp-deferred
+
+#+end_src

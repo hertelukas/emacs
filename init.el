@@ -14,9 +14,10 @@
 
 ;; Disable line numbers for some nodes
 (dolist (mode '(org-mode-hook
-		term-mode-hook
-		shell-mode-hook
-		eshell-mode-hook))
+                term-mode-hook
+                shell-mode-hook
+                treemacs-mode-hook
+                eshell-mode-hook))
   (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
 (set-face-attribute 'default nil :font "Hack NFM" :height 100) ; TODO check if this works?
@@ -171,6 +172,9 @@
 (with-eval-after-load 'evil-maps
   (define-key evil-motion-state-map (kbd "RET") nil))
 
+(use-package evil-nerd-commenter
+:bind ("C-/" . evilnc-comment-or-uncomment-lines))
+
 (defun lh/org-mode-setup()
   (org-indent-mode)
   (visual-line-mode 1)
@@ -254,3 +258,43 @@
 (org-babel-tangle))))
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'lh/org-babel-tangle-config)))
+
+(defun lh/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-enable nil))
+
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  :hook (
+         (lsp-mode . lsp-enable-which-key-integration)
+         (lsp-mode . lh/lsp-mode-setup))
+  :commands (lsp lsp-deferred))
+
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+;; if you are ivy user
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+
+;; optionally if you want to use debugger
+(use-package dap-mode)
+;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+(use-package lsp-treemacs
+  :after lsp)
+
+;; optional if you want which-key integration
+(use-package which-key
+  :config
+  (which-key-mode))
+
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
+
+(use-package lsp-pyright
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp-deferred))))  ; or lsp-deferred
