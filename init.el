@@ -70,9 +70,9 @@
 
 (use-package dashboard
   :config
-  (dashboard-setup-startup-hook)
   (setq dashboard-center-content t)
-  (setq dashboard-startup-banner 1))
+  (setq dashboard-startup-banner 1)
+  (dashboard-setup-startup-hook))
 
 (use-package which-key
   :init (which-key-mode)
@@ -272,7 +272,8 @@
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   :hook (
          (lsp-mode . lsp-enable-which-key-integration)
-         (lsp-mode . lh/lsp-mode-setup))
+         (lsp-mode . lh/lsp-mode-setup)
+         )
   :commands (lsp lsp-deferred))
 
 ;; optionally
@@ -292,6 +293,8 @@
   :config
   (which-key-mode))
 
+(add-hook 'prog-mode-hook #'lsp-deferred) ; always try to start lsp
+
 (use-package company
   :after lsp-mode
   :hook (lsp-mode . company-mode)
@@ -299,7 +302,6 @@
   (company-minimum-prefix-length 1)
   (company-idle-delay 0.0))
 
-(use-package lsp-pyright
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp-deferred))))  ; or lsp-deferred
+
+
+
