@@ -20,6 +20,9 @@
                 eshell-mode-hook))
   (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
+;; Remember where we left off in file
+(save-place-mode 1)
+
 (set-face-attribute 'default nil :font "Hack NFM" :height 100) ; TODO check if this works?
 
 ;; Initialize package sources
