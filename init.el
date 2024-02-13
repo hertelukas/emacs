@@ -42,10 +42,10 @@
 ;; For auto completion in command prompt
 (use-package ivy
   :bind (:map ivy-minibuffer-map ;; Apply the key bindings after only when in minibuffer map
-	      ("TAB" . ivy-alt-done)
-	      ("C-l" . ivy-alt-done)
-	      ("C-j" . ivy-next-line) ;; vim key binds to select command
-	      ("C-k" . ivy-previous-line))
+              ("TAB" . ivy-alt-done)
+              ("C-l" . ivy-alt-done)
+              ("C-j" . ivy-next-line) ;; vim key binds to select command
+              ("C-k" . ivy-previous-line))
   :config
   (ivy-mode))
 (use-package swiper)
@@ -67,7 +67,9 @@
 
 (use-package dashboard
   :config
-  (dashboard-setup-startup-hook))
+  (dashboard-setup-startup-hook)
+  (setq dashboard-center-content t)
+  (setq dashboard-startup-banner 1))
 
 (use-package which-key
   :init (which-key-mode)
