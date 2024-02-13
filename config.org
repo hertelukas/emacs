@@ -442,6 +442,16 @@
 
 #+end_src
 
+** Flycheck
+
+#+begin_src emacs-lisp
+
+  (use-package flycheck
+    :config
+    (add-hook 'after-init-hook #'global-flycheck-mode))
+
+#+end_src
+
 ** Languages
 
 *** Python
