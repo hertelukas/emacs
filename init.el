@@ -211,7 +211,7 @@
   (setq org-log-into-drawer t)
   (setq org-directory "~/org/")
   (setq org-agenda-files
-	'("~/org/" "~/org/roam/")))
+	'("~/org/")))
 
 (use-package org-bullets
   :after org
@@ -232,7 +232,7 @@
 ;; Roam
 (use-package org-roam
   :custom
-  (org-roam-directory "~/org/roam")
+  (org-roam-directory "~/org/")
   (org-roam-capture-templates
    '(("d" "default" plain
       "%?"
