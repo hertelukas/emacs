@@ -1,3 +1,10 @@
+#+title: Emacs From Scratch Configuration
+#+PROPERTY: header-args:emacs-lisp :tangle ./init.el
+
+* Basic UI Configuration
+
+#+begin_src emacs-lisp
+
 ;; We don't want to see a strartup message
 (setq inhibit-startup-message t)
 
@@ -19,7 +26,19 @@
 		eshell-mode-hook))
   (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
+#+end_src
+
+** Font Configuration
+
+#+begin_src emacs-lisp
+
 (set-face-attribute 'default nil :font "Hack NFM" :height 100) ; TODO check if this works?
+
+#+end_src
+
+* Packages
+
+#+begin_src emacs-lisp
 
 ;; Initialize package sources
 (require 'package) ;; Loads in package manager functionality
@@ -37,6 +56,12 @@
 
 (require 'use-package)
 (setq use-package-always-ensure t) ;; makes sure we downloaded it when we first use it
+
+#+end_src
+
+** Ivy
+
+#+begin_src emacs-lisp
 
 ;; For auto completion in command prompt
 (use-package ivy
@@ -58,21 +83,51 @@
   :init
   (ivy-rich-mode 1))
 
+#+end_src
+
+** Doom Modeline
+
+#+begin_src emacs-lisp
+
 (use-package doom-modeline
   :init (doom-modeline-mode 1))
+
+#+end_src
+
+** Rainbow Brackets
+
+#+begin_src emacs-lisp
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
+#+end_src
+
+** Dashboard
+
+#+begin_src emacs-lisp
+
 (use-package dashboard
   :config
   (dashboard-setup-startup-hook))
+
+#+end_src
+
+** Which Key
+
+#+begin_src emacs-lisp
 
 (use-package which-key
   :init (which-key-mode)
   :diminish  which-key-mode
   :config
   (setq which-key-idle-delay 0.2))
+
+#+end_src
+
+** Helpful
+
+#+begin_src emacs-lisp
 
 (use-package helpful
   :custom
@@ -84,8 +139,20 @@
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
+#+end_src
+
+** Theme
+
+#+begin_src emacs-lisp
+
 (use-package catppuccin-theme
   :init (load-theme 'catppuccin :no-confirm))
+
+#+end_src
+
+** Projectile
+
+#+begin_src emacs-lisp
 
 (use-package projectile
   :diminish projectile-mode
@@ -96,9 +163,23 @@
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
 
+#+end_src
+
+** Magit
+
+#+begin_src emacs-lisp
+
 (use-package magit
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+#+end_src
+
+* Key Bindings
+
+** General
+
+#+begin_src emacs-lisp
 
 (use-package general
   :config
@@ -150,6 +231,12 @@
     )
   )
 
+#+end_src
+
+** Evil Mode
+
+#+begin_src emacs-lisp
+
 (use-package evil
   :init
   (setq evil-want-keybinding nil)
@@ -170,6 +257,14 @@
 
 (with-eval-after-load 'evil-maps
   (define-key evil-motion-state-map (kbd "RET") nil))
+
+#+end_src
+
+** TODO Hydra
+
+* Org Mode
+
+#+begin_src emacs-lisp
 
 (defun lh/org-mode-setup()
   (org-indent-mode)
@@ -206,6 +301,12 @@
 (use-package visual-fill-column
   :hook (org-mode . efs/org-mode-visual-fill))
 
+#+end_src
+
+** Org Roam
+
+#+begin_src emacs-lisp
+
 (use-package org-roam
   :custom
   (org-roam-directory "~/org/")
@@ -237,20 +338,37 @@
   (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (org-roam-db-autosync-mode))
 
-(org-babel-do-load-languages
-'org-babel-load-languages
-'((emacs-lisp . t)
-    (python . t)
-    (C . T)))
+#+end_src
 
-(push '("conf-unix" . conf-unix) org-src-lang-modes)
+** Babel Languages
 
-;; Automaticaly tangle our config.org config file when we save it
-(defun lh/org-babel-tangle-config()
-  (when (string-equal (buffer-file-name)
-                      (expand-file-name "~/Documents/Programming/emacs/config.org"))
-;; Dynamic scoping to the rescue
-(let ((org-confirm-babel-evaluate-nil))
-(org-babel-tangle))))
+#+begin_src emacs-lisp
 
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'lh/org-babel-tangle-config)))
+  (org-babel-do-load-languages
+  'org-babel-load-languages
+  '((emacs-lisp . t)
+      (python . t)
+      (C . T)))
+
+  (push '("conf-unix" . conf-unix) org-src-lang-modes)
+
+#+end_src
+
+
+** Auto-tangle Configuration Files
+
+#+begin_src emacs-lisp
+
+    ;; Automaticaly tangle our config.org config file when we save it
+  (defun lh/org-babel-tangle-config()
+    (when (string-equal (buffer-file-name)
+                        (expand-file-name "~/Documents/Programming/emacs/config.org"))
+  ;; Dynamic scoping to the rescue
+  (let ((org-confirm-babel-evaluate-nil))
+  (org-babel-tangle))))
+
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'lh/org-babel-tangle-config)))
+
+#+end_src
+
+** TODO org-wild-notifier
