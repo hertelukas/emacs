@@ -184,61 +184,76 @@
 
 #+end_src
 
+
+* General Settings
+
+** Emacs created files
+#+begin_src emacs-lisp
+
+  (setq make-backup-files nil)
+
+#+end_src
 * Key Bindings
 
 ** General
 
 #+begin_src emacs-lisp
 
-(use-package general
-  :config
-  (general-create-definer lh/leader-keys
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC")
-  ;; Extra commands after hitting leader key
-  (lh/leader-keys
-    ;; Top level
-    "," '(counsel-switch-buffer :which-key "Switch buffer") ; TODO maybe switch to consult
-    "." '(counsel-find-file :which-key "Find file")
-    "/" '(counsel-projectile-rg :which-key "Search project")
-    ;; Buffer
-    "b" '(:ignore t :which-key "buffer")
-    "bd" '(kill-current-buffer :which-key "Kill buffer")
-    "b[" '(previous-buffer :which-key "Previous buffer")
-    "b]" '(next-buffer :which-key "Next buffer")
-    ;; File
-    "f" '(:ignore t :which-key "file")
-    "ff" '(counsel-find-file :which-key "Find file")
-    "fr" '(counsel-recentf :which-key "Find recent")
-    "fs" '(save-buffer :which-key "Save file")
-    "fS" '(write-file :which-key "Save file as...")
-    ;; git
-    "g" '(:ignore t :which-key "git")
-    "gg" '(magit :which-key "magit-status")
-    ;; org
-    "n" '(:ignore t :which-key "org")
-    "na" '(org-agenda :which-key "Org agenda")
-    "nr" '(:ignore t :which-key "roam")
-    "nrf" '(org-roam-node-find :which-key "Find node")
-    "nri" '(org-roam-node-insert :which-key "Insert link")
-    ;; Project
-    "p" '(projectile-command-map :which-key "project")
-    ;; Toggles
-    "t" '(:ignore t :which-key "toggle")
-    "tc" '(global-display-fill-column-indicator-mode :which-key "Column indicator")
-    ;; Quit
-    "q" '(:ignore t :which-key "quit")
-    "qq" '(save-buffers-kill-terminal :which-key "Quit emacs")
-    ;; Window
-    "w" '(:ignore t :which-key "window")
-    "wd" '(evil-window-delete :which-key "evil-window-delete")
-    "ws" '(evil-window-split :which-key "evil-window-split")
-    "wv" '(evil-window-vsplit :which-key "evil-window-vsplit")
-    "ww" '(evil-window-next :which-key "evil-window-next")
-    "wW" '(evil-window-prev :which-key "evil-window-prev")
+  (use-package general
+    :config
+    (general-create-definer lh/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC")
+    ;; Extra commands after hitting leader key
+    (lh/leader-keys
+      ;; Top level
+      "," '(counsel-switch-buffer :which-key "Switch buffer") ; TODO maybe switch to consult
+      "." '(counsel-find-file :which-key "Find file")
+      "/" '(counsel-projectile-rg :which-key "Search project")
+      ;; Buffer
+      "b" '(:ignore t :which-key "buffer")
+      "bd" '(kill-current-buffer :which-key "Kill buffer")
+      "b[" '(previous-buffer :which-key "Previous buffer")
+      "b]" '(next-buffer :which-key "Next buffer")
+      ;; Code
+      "c" '(:ignore t :which-key "code")
+      "cf" '(lsp-format-buffer :which-key "Format buffer")
+      "cs" '(lsp-treemacs-symbols :which-key "Treemacs symbols")
+      "cd" '(lsp-find-definition :which-key "Goto definition")
+      "cr" '(lsp-rename :which-key "LSP rename")
+      ;; File
+      "f" '(:ignore t :which-key "file")
+      "ff" '(counsel-find-file :which-key "Find file")
+      "fr" '(counsel-recentf :which-key "Find recent")
+      "fs" '(save-buffer :which-key "Save file")
+      "fS" '(write-file :which-key "Save file as...")
+      ;; git
+      "g" '(:ignore t :which-key "git")
+      "gg" '(magit :which-key "magit-status")
+      ;; org
+      "n" '(:ignore t :which-key "org")
+      "na" '(org-agenda :which-key "Org agenda")
+      "nr" '(:ignore t :which-key "roam")
+      "nrf" '(org-roam-node-find :which-key "Find node")
+      "nri" '(org-roam-node-insert :which-key "Insert link")
+      ;; Project
+      "p" '(projectile-command-map :which-key "project")
+      ;; Toggles
+      "t" '(:ignore t :which-key "toggle")
+      "tc" '(global-display-fill-column-indicator-mode :which-key "Column indicator")
+      ;; Quit
+      "q" '(:ignore t :which-key "quit")
+      "qq" '(save-buffers-kill-terminal :which-key "Quit emacs")
+      ;; Window
+      "w" '(:ignore t :which-key "window")
+      "wd" '(evil-window-delete :which-key "evil-window-delete")
+      "ws" '(evil-window-split :which-key "evil-window-split")
+      "wv" '(evil-window-vsplit :which-key "evil-window-vsplit")
+      "ww" '(evil-window-next :which-key "evil-window-next")
+      "wW" '(evil-window-prev :which-key "evil-window-prev")
+      )
     )
-  )
 
 #+end_src
 
@@ -425,10 +440,6 @@
     (which-key-mode))
 
 #+end_src
-
-** TODO Keybindings [/]
-- [ ] ~lsp-treemacs-symbols~
-- [ ] ~lsp-find-declaration~
 
 ** Company Mode
 

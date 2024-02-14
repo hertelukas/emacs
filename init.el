@@ -109,6 +109,8 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
+(setq make-backup-files nil)
+
 (use-package general
   :config
   (general-create-definer lh/leader-keys
@@ -126,6 +128,12 @@
     "bd" '(kill-current-buffer :which-key "Kill buffer")
     "b[" '(previous-buffer :which-key "Previous buffer")
     "b]" '(next-buffer :which-key "Next buffer")
+    ;; Code
+    "c" '(:ignore t :which-key "code")
+    "cf" '(lsp-format-buffer :which-key "Format buffer")
+    "cs" '(lsp-treemacs-symbols :which-key "Treemacs symbols")
+    "cd" '(lsp-find-definition :which-key "Goto definition")
+    "cr" '(lsp-rename :which-key "LSP rename")
     ;; File
     "f" '(:ignore t :which-key "file")
     "ff" '(counsel-find-file :which-key "Find file")
