@@ -19,6 +19,9 @@
   (column-number-mode) ;; show column in modeline
   (global-display-line-numbers-mode t)
 
+  ;; Column indicator at 80
+  (setq-default display-fill-column-indicator-column 80)
+
   ;; Disable line numbers for some nodes
   (dolist (mode '(org-mode-hook
                   term-mode-hook
