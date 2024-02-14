@@ -18,6 +18,7 @@
 ;; Disable line numbers for some nodes
 (dolist (mode '(org-mode-hook
                 term-mode-hook
+                vterm-mode-hook
                 shell-mode-hook
                 treemacs-mode-hook
                 eshell-mode-hook))
@@ -123,6 +124,7 @@
     "," '(counsel-switch-buffer :which-key "Switch buffer") ; TODO maybe switch to consult
     "." '(counsel-find-file :which-key "Find file")
     "/" '(counsel-projectile-rg :which-key "Search project")
+    "RET" '(vterm-other-window :which-key "vterm")
     ;; Buffer
     "b" '(:ignore t :which-key "buffer")
     "bd" '(kill-current-buffer :which-key "Kill buffer")
@@ -190,6 +192,12 @@
 
 (use-package evil-nerd-commenter
 :bind ("C-/" . evilnc-comment-or-uncomment-lines))
+
+(use-package vterm
+  :commands vterm
+  :config
+  (setq vterm-kill-buffer-on-exit t)
+  (setq vterm-max-scrollback 10000))
 
 (defun lh/org-mode-setup()
   (org-indent-mode)
