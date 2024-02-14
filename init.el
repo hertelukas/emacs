@@ -293,8 +293,6 @@
   :config
   (which-key-mode))
 
-(add-hook 'prog-mode-hook #'lsp-deferred) ; always try to start lsp
-
 (use-package company
   :after lsp-mode
   :hook (lsp-mode . company-mode)
@@ -306,6 +304,7 @@
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
+(add-hook 'c-mode-hook #'lsp-deferred)
+(add-hook 'c++-mode-hook #'lsp-deferred)
 
-
-
+(add-hook 'python-mode-hook #'lsp-deferred)
