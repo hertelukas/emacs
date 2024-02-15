@@ -280,10 +280,12 @@
   (org-roam-db-autosync-mode))
 
 (org-babel-do-load-languages
-'org-babel-load-languages
-'((emacs-lisp . t)
-    (python . t)
-    (C . T)))
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)
+   (C . T)))
+
+(setq org-confirm-babel-evaluate nil)
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
 
