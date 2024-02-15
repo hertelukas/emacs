@@ -126,6 +126,8 @@
 
 (setq make-backup-files nil)
 
+(add-hook 'find-file-hook 'recentf-save-list)
+
 (use-package general
   :config
   (general-create-definer lh/leader-keys
