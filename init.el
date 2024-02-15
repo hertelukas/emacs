@@ -27,6 +27,10 @@
 ;; Remember where we left off in file
 (save-place-mode 1)
 
+;; Do not allow the cursor in the minibuffer prompt
+(setq minibuffer-prompt-properties
+      '(read-only t cursor-intangible t face minibuffer-prompt))
+
 (set-face-attribute 'default nil :font "Hack NFM" :height 100) ; TODO check if this works?
 
 ;; Initialize package sources
@@ -46,25 +50,39 @@
 (require 'use-package)
 (setq use-package-always-ensure t) ;; makes sure we downloaded it when we first use it
 
-;; For auto completion in command prompt
-(use-package ivy
-  :bind (:map ivy-minibuffer-map ;; Apply the key bindings after only when in minibuffer map
-              ("TAB" . ivy-alt-done)
-              ("C-l" . ivy-alt-done)
-              ("C-j" . ivy-next-line) ;; vim key binds to select command
-              ("C-k" . ivy-previous-line))
-  :config
-  (ivy-mode))
-(use-package swiper)
-(use-package counsel
-  :bind (("M-x" . counsel-M-x))
-  :config
-  (setq ivy-initial-inputs-alist nil)) ;; don't start searches with ^
+(use-package consult)
 
-;; ivy rich to get detail about commands
-(use-package ivy-rich
+(use-package vertico
+  :bind (:map vertico-map
+              ("C-j" . vertico-next)
+              ("C-k" . vertico-previous)
+              :map minibuffer-local-map
+              ("C-w" . backward-kill-word))
+  :custom
+  (vertico-cycle t)
   :init
-  (ivy-rich-mode 1))
+  (vertico-mode))
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; Enable rich annotations using the Marginalia package
+(use-package marginalia
+  :after vertico
+  ;; The :init section is always executed.
+  :init
+  ;; Marginalia must be activated in the :init section of use-package such that
+  ;; the mode gets enabled right away. Note that this forces loading the
+  ;; package.
+  (marginalia-mode))
+
+;; For better searching in minibuffers
+(use-package orderless
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1))
@@ -90,9 +108,7 @@
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
   :bind
-  ([remap describe-function] . counsel-describe-function)
   ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
 (use-package catppuccin-theme
@@ -103,9 +119,6 @@
   :init
   (projectile-mode +1)
   )
-
-(use-package counsel-projectile
-  :config (counsel-projectile-mode))
 
 (use-package magit
   :custom
@@ -122,9 +135,9 @@
   ;; Extra commands after hitting leader key
   (lh/leader-keys
     ;; Top level
-    "," '(counsel-switch-buffer :which-key "Switch buffer") ; TODO maybe switch to consult
-    "." '(counsel-find-file :which-key "Find file")
-    "/" '(counsel-projectile-rg :which-key "Search project")
+    "," '(consult-buffer :which-key "Switch buffer") ; TODO maybe switch to consult
+    "." '(find-file :which-key "Find file")
+    "/" '(consult-ripgrep :which-key "Search project")
     "RET" '(vterm-other-window :which-key "vterm")
     ;; Buffer
     "b" '(:ignore t :which-key "buffer")
@@ -139,8 +152,8 @@
     "cr" '(lsp-rename :which-key "LSP rename")
     ;; File
     "f" '(:ignore t :which-key "file")
-    "ff" '(counsel-find-file :which-key "Find file")
-    "fr" '(counsel-recentf :which-key "Find recent")
+    "ff" '(find-file :which-key "Find file")
+    "fr" '(recentf :which-key "Find recent")
     "fs" '(save-buffer :which-key "Save file")
     "fS" '(write-file :which-key "Save file as...")
     ;; git
@@ -298,8 +311,6 @@
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
-;; if you are ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
 ;; optionally if you want to use debugger
 (use-package dap-mode)
