@@ -340,4 +340,5 @@
 
 (add-hook 'python-mode-hook #'lsp-deferred)
 
-(use-package rustic)
+(use-package rustic
+  :hook (server-after-make-frame . catppuccin-reload))

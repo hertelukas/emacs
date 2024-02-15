@@ -521,6 +521,7 @@
 
 #+begin_src emacs-lisp
 
-  (use-package rustic)
+  (use-package rustic
+    :hook (server-after-make-frame . catppuccin-reload))
 
 #+end_src
