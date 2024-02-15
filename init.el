@@ -76,6 +76,7 @@
   :config
   (setq dashboard-center-content t)
   (setq dashboard-startup-banner 1)
+  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
   (dashboard-setup-startup-hook))
 
 (use-package which-key
