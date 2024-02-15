@@ -339,3 +339,5 @@
 (add-hook 'c++-mode-hook #'lsp-deferred)
 
 (add-hook 'python-mode-hook #'lsp-deferred)
+
+(use-package rustic)

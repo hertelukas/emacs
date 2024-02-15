@@ -516,3 +516,11 @@
   (add-hook 'python-mode-hook #'lsp-deferred)
 
 #+end_src
+
+*** Rust
+
+#+begin_src emacs-lisp
+
+  (use-package rustic)
+
+#+end_src
