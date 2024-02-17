@@ -337,40 +337,43 @@
 
 #+begin_src emacs-lisp
 
-(defun lh/org-mode-setup()
-  (org-indent-mode)
-  (visual-line-mode 1)
-  (setq evil-auto-indent nil)
-  (setq org-hide-emphasis-markers t)
-  (setq org-return-follows-link t)
-  (setf (alist-get 'file org-link-frame-setup) #'find-file)
-  )
+  (defun lh/org-mode-setup()
+    (org-indent-mode)
+    (visual-line-mode 1)
+    (setq evil-auto-indent nil)
+    (setq org-hide-emphasis-markers t)
+    (setq org-return-follows-link t)
+    (setf (alist-get 'file org-link-frame-setup) #'find-file)
+    )
 
-(use-package org
-  :hook (org-mode . lh/org-mode-setup)
-  :config
-  (setq org-ellipsis " ▾")
+  (use-package org
+    :hook (org-mode . lh/org-mode-setup)
+    :config
+    (setq org-ellipsis " ▾")
 
-  ;; agenda
-  (setq org-log-done 'time)
-  (setq org-log-into-drawer t)
-  (setq org-directory "~/org/")
-  (setq org-agenda-files
-	'("~/org/")))
+    ;; agenda
+    (setq org-log-done 'time)
+    (setq org-log-into-drawer t)
+    (setq org-directory "~/org/")
+    (setq org-agenda-files
+          '("~/org/")))
 
-(use-package org-bullets
-  :after org
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+  (use-package org-bullets
+    :after org
+    :hook (org-mode . org-bullets-mode)
+    :custom
+    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-(defun efs/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
+  (defun lh/org-mode-visual-fill ()
+    (setq visual-fill-column-width 100
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode 1))
 
-(use-package visual-fill-column
-  :hook (org-mode . efs/org-mode-visual-fill))
+  (use-package visual-fill-column
+    :hook (org-mode . lh/org-mode-visual-fill))
+
+  (use-package org-appear
+    :hook (org-mode . org-appear-mode))
 
 #+end_src
 

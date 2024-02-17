@@ -234,7 +234,7 @@
   (setq org-log-into-drawer t)
   (setq org-directory "~/org/")
   (setq org-agenda-files
-	'("~/org/")))
+        '("~/org/")))
 
 (use-package org-bullets
   :after org
@@ -242,13 +242,16 @@
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-(defun efs/org-mode-visual-fill ()
+(defun lh/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
-  :hook (org-mode . efs/org-mode-visual-fill))
+  :hook (org-mode . lh/org-mode-visual-fill))
+
+(use-package org-appear
+  :hook (org-mode . org-appear-mode))
 
 (use-package org-roam
   :custom
