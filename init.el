@@ -130,7 +130,12 @@
 (setq custom-file (locate-user-emacs-file "custom-vars.el"))
 (load custom-file 'noerror 'nomessage)
 
+;; TODO this needs some fixing - a bit annoying atm
 (add-hook 'find-file-hook 'recentf-save-list)
+
+;; If file changes on the disk and no unsaved changes, update
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-bufferst t)
 
 (use-package general
   :config
