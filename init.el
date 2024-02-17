@@ -126,6 +126,10 @@
 
 (setq make-backup-files nil)
 
+;; Move customization variables to a separate file and loat it
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file 'noerror 'nomessage)
+
 (add-hook 'find-file-hook 'recentf-save-list)
 
 (use-package general
