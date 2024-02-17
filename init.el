@@ -137,6 +137,9 @@
 (global-auto-revert-mode 1)
 (setq global-auto-revert-non-file-bufferst t)
 
+;; Turn off auto saving - I can do that myself
+(setq auto-save-default nil)
+
 (use-package general
   :config
   (general-create-definer lh/leader-keys
