@@ -211,6 +211,14 @@
 
 (use-package vterm
   :commands vterm
+  :init
+  (add-hook 'vterm-exit-functions
+            (lambda (_ _)
+              (let* ((buffer (current-buffer))
+                     (window (get-buffer-window buffer)))
+                (when (not (one-window-p))
+                  (delete-window window))
+                (kill-buffer buffer))))
   :config
   (setq vterm-kill-buffer-on-exit t)
   (setq vterm-max-scrollback 10000))
