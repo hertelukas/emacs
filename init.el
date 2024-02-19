@@ -139,6 +139,8 @@
 
 ;; Turn off auto saving - I can do that myself
 (setq auto-save-default nil)
+;; show up if unsaved changes, so no two buffers edit the file
+(setq create-lockfiles nil)
 
 (use-package general
   :config
