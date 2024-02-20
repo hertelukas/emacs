@@ -1,7 +1,82 @@
-#+title: Emacs From Scratch Configuration
+#+title: Emacs Configuration
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
-* Basic UI Configuration
+* Package System
+
+#+begin_src emacs-lisp
+
+  ;; Initialize package sources
+  (require 'package) ;; Loads in package manager functionality
+
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")))
+  (package-initialize)
+  ;; If we don't have an archive of pacakges, load package archive
+  (unless package-archive-contents 
+    (package-refresh-contents))
+
+  ;; If we don't have use-package installed, do it now
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t) ;; makes sure we downloaded it when we first use it
+
+#+end_src
+
+
+** Automatic Package Updates
+
+#+begin_src emacs-lisp
+
+  (use-package auto-package-update
+    :custom
+    (auto-package-update-interval 7)
+    (auto-package-update-prompt-before-update t)
+    (auto-package-update-hide-results t)
+    :config
+    (auto-package-update-maybe)
+    (auto-package-update-at-time "09:00"))
+
+#+end_src
+
+* Keep Folders Clean
+
+#+begin_src emacs-lisp
+
+  (setq make-backup-files nil)
+
+  ;; Move customization variables to a separate file and loat it
+  (setq custom-file (locate-user-emacs-file "custom-vars.el"))
+  (load custom-file 'noerror 'nomessage)
+
+  ;; TODO this needs some fixing - a bit annoying atm
+  (add-hook 'find-file-hook 'recentf-save-list)
+
+  ;; If file changes on the disk and no unsaved changes, update
+  (global-auto-revert-mode 1)
+  (setq global-auto-revert-non-file-bufferst t)
+
+  ;; Turn off auto saving - I can do that myself
+  (setq auto-save-default nil)
+  ;; show up if unsaved changes, so no two buffers edit the file
+  (setq create-lockfiles nil) 
+
+#+end_src
+
+** no-littering
+
+This package is used to keep ~.config/emacs~ clean, avoiding issues with git and syncthing.
+
+#+begin_src emacs-lisp
+
+(use-package no-littering)
+
+#+end_src
+
+
+* UI Configuration
 
 #+begin_src emacs-lisp
 
@@ -34,10 +109,6 @@
   ;; Remember where we left off in file
   (save-place-mode 1)
 
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-
 #+end_src
 
 ** Font Configuration
@@ -48,28 +119,48 @@
 
 #+end_src
 
-* Packages
+** Theme
 
 #+begin_src emacs-lisp
 
-  ;; Initialize package sources
-  (require 'package) ;; Loads in package manager functionality
-
-  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                           ("org" . "https://orgmode.org/elpa/")
-                           ("elpa" . "https://elpa.gnu.org/packages/")))
-  (package-initialize)
-  (unless package-archive-contents ;; If we don't have an archive of pacakges, load package archive
-    (package-refresh-contents))
-
-  ;; If we don't have use-package installed, do it now
-  (unless (package-installed-p 'use-package)
-    (package-install 'use-package))
-
-  (require 'use-package)
-  (setq use-package-always-ensure t) ;; makes sure we downloaded it when we first use it
+(use-package catppuccin-theme
+  :init (load-theme 'catppuccin :no-confirm))
 
 #+end_src
+
+** Modeline
+
+#+begin_src emacs-lisp
+
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1))
+
+#+end_src
+
+** Dashboard
+
+#+begin_src emacs-lisp
+
+  (use-package dashboard
+    :config
+    (setq dashboard-center-content t)
+    (setq dashboard-startup-banner 1)
+    (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+    (dashboard-setup-startup-hook))
+
+#+end_src
+
+*** TODO Reload dashboard if we open new emacsclient
+
+** Highlight TODOs
+
+#+begin_src emacs-lisp
+
+   (use-package hl-todo)
+
+#+end_src
+
+* Packages improving emacs
 
 ** Consult
 
@@ -80,6 +171,8 @@
 #+end_src
 
 ** Vertico
+
+To have auto completions in emacs buffers.
 
 #+begin_src emacs-lisp
 
@@ -117,49 +210,6 @@
 
 #+end_src
 
-** Doom Modeline
-
-#+begin_src emacs-lisp
-
-  (use-package doom-modeline
-    :init (doom-modeline-mode 1))
-
-#+end_src
-
-** Rainbow Brackets
-
-#+begin_src emacs-lisp
-
-  (use-package rainbow-delimiters
-    :hook (prog-mode . rainbow-delimiters-mode))
-
-#+end_src
-
-** Dashboard
-
-#+begin_src emacs-lisp
-
-  (use-package dashboard
-    :config
-    (setq dashboard-center-content t)
-    (setq dashboard-startup-banner 1)
-    (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-    (dashboard-setup-startup-hook))
-
-#+end_src
-
-** Which Key
-
-#+begin_src emacs-lisp
-
-(use-package which-key
-  :init (which-key-mode)
-  :diminish  which-key-mode
-  :config
-  (setq which-key-idle-delay 0.2))
-
-#+end_src
-
 ** Helpful
 
 #+begin_src emacs-lisp
@@ -171,64 +221,6 @@
   :bind
   ([remap describe-command] . helpful-command)
   ([remap describe-key] . helpful-key))
-
-#+end_src
-
-** Theme
-
-#+begin_src emacs-lisp
-
-(use-package catppuccin-theme
-  :init (load-theme 'catppuccin :no-confirm))
-
-#+end_src
-
-** Projectile
-
-#+begin_src emacs-lisp
-
-(use-package projectile
-  :diminish projectile-mode
-  :init
-  (projectile-mode +1)
-  )
-
-#+end_src
-
-** Magit
-
-#+begin_src emacs-lisp
-
-(use-package magit
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-#+end_src
-
-
-* General Settings
-
-** Emacs created files
-
-#+begin_src emacs-lisp
-
-  (setq make-backup-files nil)
-
-  ;; Move customization variables to a separate file and loat it
-  (setq custom-file (locate-user-emacs-file "custom-vars.el"))
-  (load custom-file 'noerror 'nomessage)
-
-  ;; TODO this needs some fixing - a bit annoying atm
-  (add-hook 'find-file-hook 'recentf-save-list)
-
-  ;; If file changes on the disk and no unsaved changes, update
-  (global-auto-revert-mode 1)
-  (setq global-auto-revert-non-file-bufferst t)
-
-  ;; Turn off auto saving - I can do that myself
-  (setq auto-save-default nil)
-  ;; show up if unsaved changes, so no two buffers edit the file
-  (setq create-lockfiles nil) 
 
 #+end_src
 
@@ -324,6 +316,18 @@
 
 #+end_src
 
+** Which Key
+
+#+begin_src emacs-lisp
+
+(use-package which-key
+  :init (which-key-mode)
+  :diminish  which-key-mode
+  :config
+  (setq which-key-idle-delay 0.2))
+
+#+end_src
+
 ** Commenting
 
 #+begin_src emacs-lisp
@@ -333,6 +337,7 @@
 
 #+end_src
 
+* Terminals
 
 ** vterm
 
@@ -341,6 +346,7 @@
   (use-package vterm
     :commands vterm
     :init
+    ;; This auto closes the window on exit
     (add-hook 'vterm-exit-functions
               (lambda (_ _)
                 (let* ((buffer (current-buffer))
@@ -472,7 +478,9 @@
 
 ** TODO org-wild-notifier
 
-* LSP
+* Development
+
+** LSP
 
 #+begin_src emacs-lisp
 
@@ -505,29 +513,6 @@
 
 #+end_src
 
-** Company Mode
-
-#+begin_src emacs-lisp
-
-  (use-package company
-    :after lsp-mode
-    :hook (lsp-mode . company-mode)
-    :custom
-    (company-minimum-prefix-length 1)
-    (company-idle-delay 0.0))
-
-#+end_src
-
-** Flycheck
-
-#+begin_src emacs-lisp
-
-  (use-package flycheck
-    :config
-    (add-hook 'after-init-hook #'global-flycheck-mode))
-
-#+end_src
-
 ** Languages
 
 *** C/C++
@@ -553,6 +538,60 @@
 
   (use-package rustic
     :hook (server-after-make-frame . catppuccin-reload))
+
+#+end_src
+
+** Company Mode
+
+#+begin_src emacs-lisp
+
+  (use-package company
+    :after lsp-mode
+    :hook (lsp-mode . company-mode)
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0.0))
+
+#+end_src
+
+** Flycheck
+
+#+begin_src emacs-lisp
+
+  (use-package flycheck
+    :config
+    (add-hook 'after-init-hook #'global-flycheck-mode))
+
+#+end_src
+
+** Projectile
+
+#+begin_src emacs-lisp
+
+(use-package projectile
+  :diminish projectile-mode
+  :init
+  (projectile-mode +1)
+  )
+
+#+end_src
+
+** Magit
+
+#+begin_src emacs-lisp
+
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+#+end_src
+
+** Rainbow Brackets
+
+#+begin_src emacs-lisp
+
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
 
 #+end_src
 

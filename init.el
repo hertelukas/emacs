@@ -1,3 +1,50 @@
+;; Initialize package sources
+(require 'package) ;; Loads in package manager functionality
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
+;; If we don't have an archive of pacakges, load package archive
+(unless package-archive-contents 
+  (package-refresh-contents))
+
+;; If we don't have use-package installed, do it now
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t) ;; makes sure we downloaded it when we first use it
+
+(use-package auto-package-update
+  :custom
+  (auto-package-update-interval 7)
+  (auto-package-update-prompt-before-update t)
+  (auto-package-update-hide-results t)
+  :config
+  (auto-package-update-maybe)
+  (auto-package-update-at-time "09:00"))
+
+(setq make-backup-files nil)
+
+;; Move customization variables to a separate file and loat it
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file 'noerror 'nomessage)
+
+;; TODO this needs some fixing - a bit annoying atm
+(add-hook 'find-file-hook 'recentf-save-list)
+
+;; If file changes on the disk and no unsaved changes, update
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-bufferst t)
+
+;; Turn off auto saving - I can do that myself
+(setq auto-save-default nil)
+;; show up if unsaved changes, so no two buffers edit the file
+(setq create-lockfiles nil)
+
+(use-package no-littering)
+
 ;; We don't want to see a strartup message
 (setq inhibit-startup-message t)
 
@@ -27,28 +74,22 @@
 ;; Remember where we left off in file
 (save-place-mode 1)
 
-;; Do not allow the cursor in the minibuffer prompt
-(setq minibuffer-prompt-properties
-      '(read-only t cursor-intangible t face minibuffer-prompt))
-
 (set-face-attribute 'default nil :font "Hack NFM" :height 100) ; TODO check if this works?
 
-;; Initialize package sources
-(require 'package) ;; Loads in package manager functionality
+(use-package catppuccin-theme
+  :init (load-theme 'catppuccin :no-confirm))
 
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-(package-initialize)
-(unless package-archive-contents ;; If we don't have an archive of pacakges, load package archive
-  (package-refresh-contents))
+(use-package doom-modeline
+  :init (doom-modeline-mode 1))
 
-;; If we don't have use-package installed, do it now
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
+(use-package dashboard
+  :config
+  (setq dashboard-center-content t)
+  (setq dashboard-startup-banner 1)
+  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  (dashboard-setup-startup-hook))
 
-(require 'use-package)
-(setq use-package-always-ensure t) ;; makes sure we downloaded it when we first use it
+(use-package hl-todo)
 
 (use-package consult)
 
@@ -84,25 +125,6 @@
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
-(use-package doom-modeline
-  :init (doom-modeline-mode 1))
-
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
-
-(use-package dashboard
-  :config
-  (setq dashboard-center-content t)
-  (setq dashboard-startup-banner 1)
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-  (dashboard-setup-startup-hook))
-
-(use-package which-key
-  :init (which-key-mode)
-  :diminish  which-key-mode
-  :config
-  (setq which-key-idle-delay 0.2))
-
 (use-package helpful
   :custom
   (counsel-describe-function-function #'helpful-callable)
@@ -110,37 +132,6 @@
   :bind
   ([remap describe-command] . helpful-command)
   ([remap describe-key] . helpful-key))
-
-(use-package catppuccin-theme
-  :init (load-theme 'catppuccin :no-confirm))
-
-(use-package projectile
-  :diminish projectile-mode
-  :init
-  (projectile-mode +1)
-  )
-
-(use-package magit
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-(setq make-backup-files nil)
-
-;; Move customization variables to a separate file and loat it
-(setq custom-file (locate-user-emacs-file "custom-vars.el"))
-(load custom-file 'noerror 'nomessage)
-
-;; TODO this needs some fixing - a bit annoying atm
-(add-hook 'find-file-hook 'recentf-save-list)
-
-;; If file changes on the disk and no unsaved changes, update
-(global-auto-revert-mode 1)
-(setq global-auto-revert-non-file-bufferst t)
-
-;; Turn off auto saving - I can do that myself
-(setq auto-save-default nil)
-;; show up if unsaved changes, so no two buffers edit the file
-(setq create-lockfiles nil)
 
 (use-package general
   :config
@@ -220,12 +211,19 @@
 (with-eval-after-load 'evil-maps
   (define-key evil-motion-state-map (kbd "RET") nil))
 
+(use-package which-key
+  :init (which-key-mode)
+  :diminish  which-key-mode
+  :config
+  (setq which-key-idle-delay 0.2))
+
 (use-package evil-nerd-commenter
 :bind ("C-/" . evilnc-comment-or-uncomment-lines))
 
 (use-package vterm
   :commands vterm
   :init
+  ;; This auto closes the window on exit
   (add-hook 'vterm-exit-functions
             (lambda (_ _)
               (let* ((buffer (current-buffer))
@@ -353,6 +351,14 @@
   :config
   (which-key-mode))
 
+(add-hook 'c-mode-hook #'lsp-deferred)
+(add-hook 'c++-mode-hook #'lsp-deferred)
+
+(add-hook 'python-mode-hook #'lsp-deferred)
+
+(use-package rustic
+  :hook (server-after-make-frame . catppuccin-reload))
+
 (use-package company
   :after lsp-mode
   :hook (lsp-mode . company-mode)
@@ -364,10 +370,15 @@
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
-(add-hook 'c-mode-hook #'lsp-deferred)
-(add-hook 'c++-mode-hook #'lsp-deferred)
+(use-package projectile
+  :diminish projectile-mode
+  :init
+  (projectile-mode +1)
+  )
 
-(add-hook 'python-mode-hook #'lsp-deferred)
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-(use-package rustic
-  :hook (server-after-make-frame . catppuccin-reload))
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
