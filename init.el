@@ -1,244 +1,279 @@
-;; Initialize package sources
-(require 'package) ;; Loads in package manager functionality
+;; ---------------------------
+;; Package managmenet: straight.el
+;; --------------------------
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-(package-initialize)
-;; If we don't have an archive of pacakges, load package archive
-(unless package-archive-contents 
-  (package-refresh-contents))
-
-;; If we don't have use-package installed, do it now
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-(require 'use-package)
-(setq use-package-always-ensure t) ;; makes sure we downloaded it when we first use it
-
-(use-package auto-package-update
-  :custom
-  (auto-package-update-interval 7)
-  (auto-package-update-prompt-before-update t)
-  (auto-package-update-hide-results t)
-  :config
-  (auto-package-update-maybe)
-  (auto-package-update-at-time "09:00"))
-
-(setq make-backup-files nil)
-
-;; Move customization variables to a separate file and loat it
-(setq custom-file (locate-user-emacs-file "custom-vars.el"))
-(load custom-file 'noerror 'nomessage)
-
-;; TODO this needs some fixing - a bit annoying atm
-(add-hook 'find-file-hook 'recentf-save-list)
-
-;; If file changes on the disk and no unsaved changes, update
-(global-auto-revert-mode 1)
-(setq global-auto-revert-non-file-bufferst t)
-
-;; Turn off auto saving - I can do that myself
-(setq auto-save-default nil)
-;; show up if unsaved changes, so no two buffers edit the file
-(setq create-lockfiles nil)
-
-(use-package no-littering)
-
-;; We don't want to see a strartup message
-(setq inhibit-startup-message t)
-
-(scroll-bar-mode -1) ; Disable visible scroll bar
-(tool-bar-mode -1)   ; Disable the toolbar
-(tooltip-mode -1)    ; Disable tooltips
-(set-fringe-mode 10) ; Give some breathing room
-
-(menu-bar-mode -1)   ; Disable menu bar
+;; Use by default
+(setq straight-use-package-by-default t)
+;; ---------------------------
+;; General settings
+;; ---------------------------
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(tooltip-mode -1)
+(menu-bar-mode -1)
 
 ;; Line numbers
-(column-number-mode) ;; show column in modeline
-(global-display-line-numbers-mode t)
+(global-hl-line-mode t)
+(setq display-line-numbers-type 'relative)
+(global-display-line-numbers-mode 1)
 
-;; Column indicator at 80
-(setq-default display-fill-column-indicator-column 80)
-
-;; Disable line numbers for some nodes
-(dolist (mode '(org-mode-hook
-                term-mode-hook
-                vterm-mode-hook
-                shell-mode-hook
-                treemacs-mode-hook
-                eshell-mode-hook))
-  (add-hook mode(lambda () (display-line-numbers-mode 0))))
-
-;; Remember where we left off in file
+;; Remember where we left off in files
 (save-place-mode 1)
 
-(set-face-attribute 'default nil :font "Hack NFM" :height 100) ; TODO check if this works?
+;; Disable startup message
+(setq inhibit-startup-message t)
 
-(use-package catppuccin-theme
-  :init (load-theme 'catppuccin :no-confirm))
+;; If file changes on disk and no unsaved changes, update
+(global-auto-revert-mode 1)
 
-(use-package doom-modeline
-  :init (doom-modeline-mode 1))
+;; Disable autosave and lock files
+(setq auto-save-default nil)
+(setq create-lockfiles nil)
+(setq make-backup-files nil)
 
-(use-package dashboard
-  :config
-  (setq dashboard-center-content t)
-  (setq dashboard-startup-banner 1)
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-  (dashboard-setup-startup-hook))
-
-(use-package hl-todo)
-
-(use-package consult)
-
-(use-package vertico
-  :bind (:map vertico-map
-              ("C-j" . vertico-next)
-              ("C-k" . vertico-previous)
-              :map minibuffer-local-map
-              ("C-w" . backward-kill-word))
-  :custom
-  (vertico-cycle t)
-  :init
-  (vertico-mode))
+;; Show column in modeline
+(column-number-mode 1)
 
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
   :init
   (savehist-mode))
+;; ----------------------
+;; Window management
+;; ----------------------
+(defvar window-keymap
+  (let ((keymap (make-keymap)))
+    (define-key keymap (kbd "w") #'other-window)
+    (define-key keymap (kbd "u") #'winner-undo)
+    (define-key keymap (kbd "r") #'winner-redo)
+    (define-key keymap (kbd "h") #'split-window-below)
+    (define-key keymap (kbd "v") #'split-window-right)
+    (define-key keymap (kbd "c") #'delete-window)
+    (define-key keymap (kbd "o") #'delete-other-windows)
+    keymap))
 
-;; Enable rich annotations using the Marginalia package
-(use-package marginalia
-  :after vertico
-  ;; The :init section is always executed.
+;; define an alias for your keymap
+(defalias 'window-keymap window-keymap)
+(winner-mode 1)
+;; ---------------------------
+;; Modal editing: Meow
+;; ---------------------------
+(defvar file-keymap
+  (let ((keymap (make-keymap)))
+    (define-key keymap (kbd "r") #'recentf)
+    (define-key keymap (kbd "s") #'save-buffer)
+    (define-key keymap (kbd "f") #'find-file)
+    keymap))
+
+(defalias 'file-keymap file-keymap)
+
+(defvar eglot-keymap
+  (let ((keymap (make-keymap)))
+    (define-key keymap (kbd "a") #'eglot-code-actions)
+    (define-key keymap (kbd "f") #'eglot-format-buffer)
+    (define-key keymap (kbd "D") #'eglot-find-typeDefinition)
+    (define-key keymap (kbd "d") #'eglot-find-declaration)
+    (define-key keymap (kbd "i") #'eglot-find-implementation)
+    keymap))
+
+(defalias 'eglot-keymap eglot-keymap)
+
+(defvar roam-keymap
+  (let ((keymap (make-keymap)))
+    (define-key keymap (kbd "f") #'org-roam-node-find)
+    (define-key keymap (kbd "i") #'org-roam-node-insert)
+    keymap))
+
+(defalias 'roam-keymap roam-keymap)
+
+(defun meow-setup ()
+  (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+  (meow-motion-define-key
+   '("j" . meow-next)
+   '("k" . meow-prev)
+   '("<escape>" . ignore))
+  (meow-leader-define-key
+   ;; Use SPC (0-9) for digit arguments.
+   '("1" . meow-digit-argument)
+   '("2" . meow-digit-argument)
+   '("3" . meow-digit-argument)
+   '("4" . meow-digit-argument)
+   '("5" . meow-digit-argument)
+   '("6" . meow-digit-argument)
+   '("7" . meow-digit-argument)
+   '("8" . meow-digit-argument)
+   '("9" . meow-digit-argument)
+   '("0" . meow-digit-argument)
+   '("," . consult-buffer)
+   '("." . find-file)
+   '("w" . window-keymap)
+   '("f" . file-keymap)
+   '("e" . eglot-keymap)
+   '("r" . roam-keymap)
+   ;; Project options
+   '("p" . "C-x p")
+   ;; Quit options
+   '("q q" . save-buffers-kill-terminal)
+   '("/" . consult-ripgrep)
+   '("?" . meow-cheatsheet)
+   )
+  (meow-normal-define-key
+   '("0" . meow-expand-0)
+   '("9" . meow-expand-9)
+   '("8" . meow-expand-8)
+   '("7" . meow-expand-7)
+   '("6" . meow-expand-6)
+   '("5" . meow-expand-5)
+   '("4" . meow-expand-4)
+   '("3" . meow-expand-3)
+   '("2" . meow-expand-2)
+   '("1" . meow-expand-1)
+   '("-" . negative-argument)
+   '(";" . meow-reverse)
+   '("," . meow-inner-of-thing)
+   '("." . meow-bounds-of-thing)
+   '("[" . meow-beginning-of-thing)
+   '("]" . meow-end-of-thing)
+   '("a" . meow-append)
+   '("A" . meow-open-below)
+   '("b" . meow-back-word)
+   '("B" . meow-back-symbol)
+   '("c" . meow-change)
+   '("d" . meow-delete)
+   '("D" . meow-backward-delete)
+   '("e" . meow-next-word)
+   '("E" . meow-next-symbol)
+   '("f" . meow-find)
+   '("g" . meow-cancel-selection)
+   '("G" . meow-grab)
+   '("h" . meow-left)
+   '("H" . meow-left-expand)
+   '("i" . meow-insert)
+   '("I" . meow-open-above)
+   '("j" . meow-next)
+   '("J" . meow-next-expand)
+   '("k" . meow-prev)
+   '("K" . meow-prev-expand)
+   '("l" . meow-right)
+   '("L" . meow-right-expand)
+   '("m" . meow-join)
+   '("n" . meow-search)
+   '("o" . meow-block)
+   '("O" . meow-to-block)
+   '("p" . meow-yank)
+   '("q" . meow-quit)
+   '("Q" . meow-goto-line)
+   '("r" . meow-replace)
+   '("R" . meow-swap-grab)
+   '("s" . meow-kill)
+   '("t" . meow-till)
+   '("u" . meow-undo)
+   '("U" . meow-undo-in-selection)
+   '("v" . meow-visit)
+   '("w" . meow-mark-word)
+   '("W" . meow-mark-symbol)
+   '("x" . meow-line)
+   '("X" . meow-goto-line)
+   '("y" . meow-save)
+   '("Y" . meow-sync-grab)
+   '("z" . meow-pop-selection)
+   '("'" . repeat)
+   '("<escape>" . ignore)))
+
+(use-package meow
   :init
-  ;; Marginalia must be activated in the :init section of use-package such that
-  ;; the mode gets enabled right away. Note that this forces loading the
-  ;; package.
+  (setq meow-use-clipboard t)
+  :config
+  (meow-setup)
+  (meow-global-mode 1)
+
+  (add-hook 'meow-insert-enter-hook
+	  (lambda () (setq display-line-numbers t)))
+
+  (add-hook 'meow-insert-exit-hook
+	  (lambda () (setq display-line-numbers 'relative)))
+  )
+
+;; ----------------------
+;; Color Theme
+;; ----------------------
+(straight-use-package 'catppuccin-theme)
+(load-theme 'catppuccin :no-confirm)
+
+
+;; ----------------------
+;; Magit
+;; ----------------------
+(straight-use-package 'magit)
+
+;; ----------------------
+;; LSP
+;; ----------------------
+(straight-use-package 'eglot)
+
+(setq treesit-language-source-alist
+      '((rust "https://github.com/tree-sitter/tree-sitter-rust")))
+
+(unless (treesit-language-available-p 'rust)
+  (treesit-install-language-grammar 'rust))
+
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
+(add-hook 'rust-ts-mode-hook #'eglot-ensure)
+
+;; ----------------------
+;; Completion
+;; ----------------------
+(use-package vertico
+  :bind (:map vertico-map
+	      ("C-j" . vertico-next)
+	      ("C-k" . vertico-previous)
+	      :map minibuffer-local-map
+	      ("C-w" . backward-kill-sexp))
+  :custom
+  (vertico-cycle t)
+  :init
+  (vertico-mode))
+
+(use-package corfu
+  :init
+  (global-corfu-mode))
+
+(use-package marginalia
+  :init
   (marginalia-mode))
 
-;; For better searching in minibuffers
+(use-package consult
+  :config
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref))
+
 (use-package orderless
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-command] . helpful-command)
-  ([remap describe-key] . helpful-key))
-
-(use-package general
-  :config
-  (general-create-definer lh/leader-keys
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC")
-  ;; Extra commands after hitting leader key
-  (lh/leader-keys
-    ;; Top level
-    "," '(consult-buffer :which-key "Switch buffer") ; TODO maybe switch to consult
-    "." '(find-file :which-key "Find file")
-    "/" '(consult-ripgrep :which-key "Search project")
-    "RET" '(vterm-other-window :which-key "vterm")
-    ;; Buffer
-    "b" '(:ignore t :which-key "buffer")
-    "bd" '(kill-current-buffer :which-key "Kill buffer")
-    "b[" '(previous-buffer :which-key "Previous buffer")
-    "b]" '(next-buffer :which-key "Next buffer")
-    ;; Code
-    "c" '(:ignore t :which-key "code")
-    "cf" '(lsp-format-buffer :which-key "Format buffer")
-    "cs" '(lsp-treemacs-symbols :which-key "Treemacs symbols")
-    "cd" '(lsp-find-definition :which-key "Goto definition")
-    "cr" '(lsp-rename :which-key "LSP rename")
-    ;; File
-    "f" '(:ignore t :which-key "file")
-    "ff" '(find-file :which-key "Find file")
-    "fr" '(recentf :which-key "Find recent")
-    "fs" '(save-buffer :which-key "Save file")
-    "fS" '(write-file :which-key "Save file as...")
-    ;; git
-    "g" '(:ignore t :which-key "git")
-    "gg" '(magit :which-key "magit-status")
-    ;; org
-    "n" '(:ignore t :which-key "org")
-    "na" '(org-agenda :which-key "Org agenda")
-    "nr" '(:ignore t :which-key "roam")
-    "nrf" '(org-roam-node-find :which-key "Find node")
-    "nri" '(org-roam-node-insert :which-key "Insert link")
-    ;; Project
-    "p" '(projectile-command-map :which-key "project")
-    ;; Toggles
-    "t" '(:ignore t :which-key "toggle")
-    "tc" '(global-display-fill-column-indicator-mode :which-key "Column indicator")
-    ;; Quit
-    "q" '(:ignore t :which-key "quit")
-    "qq" '(save-buffers-kill-terminal :which-key "Quit emacs")
-    ;; Window
-    "w" '(:ignore t :which-key "window")
-    "wd" '(evil-window-delete :which-key "evil-window-delete")
-    "ws" '(evil-window-split :which-key "evil-window-split")
-    "wv" '(evil-window-vsplit :which-key "evil-window-vsplit")
-    "ww" '(evil-window-next :which-key "evil-window-next")
-    "wW" '(evil-window-prev :which-key "evil-window-prev")
-    )
-  )
-
-(use-package evil
-  :init
-  (setq evil-want-keybinding nil)
-  :config
-  (evil-mode 1)
-  ;; On line wrapping, don't jump over whole line
-  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-  (evil-global-set-key 'motion "k" 'evil-previous-visual-line))
-
-;; useful for vim keybinds in other buffers which make sense
-(use-package evil-collection
-  :after evil ; load after evil has loaded
-  :config
-  (evil-collection-init))
-
-;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-(with-eval-after-load 'evil-maps
-  (define-key evil-motion-state-map (kbd "RET") nil))
-
-(use-package which-key
-  :init (which-key-mode)
-  :diminish  which-key-mode
-  :config
-  (setq which-key-idle-delay 0.2))
-
-(use-package evil-nerd-commenter
-:bind ("C-/" . evilnc-comment-or-uncomment-lines))
-
-(use-package vterm
-  :commands vterm
-  :init
-  ;; This auto closes the window on exit
-  (add-hook 'vterm-exit-functions
-            (lambda (_ _)
-              (let* ((buffer (current-buffer))
-                     (window (get-buffer-window buffer)))
-                (when (not (one-window-p))
-                  (delete-window window))
-                (kill-buffer buffer))))
-  :config
-  (setq vterm-kill-buffer-on-exit t)
-  (setq vterm-max-scrollback 10000))
-
+;; ----------------------
+;; Org Mode
+;; ----------------------
 (defun lh/org-mode-setup()
-  (org-indent-mode)
+  (org-indent-mode 1)
   (visual-line-mode 1)
-  (setq evil-auto-indent nil)
+  (display-line-numbers-mode -1)
   (setq org-hide-emphasis-markers t)
   (setq org-return-follows-link t)
   (setf (alist-get 'file org-link-frame-setup) #'find-file)
@@ -256,12 +291,6 @@
   (setq org-agenda-files
         '("~/org/")))
 
-(use-package org-bullets
-  :after org
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
 (defun lh/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
@@ -269,9 +298,6 @@
 
 (use-package visual-fill-column
   :hook (org-mode . lh/org-mode-visual-fill))
-
-(use-package org-appear
-  :hook (org-mode . org-appear-mode))
 
 (use-package org-roam
   :custom
@@ -304,81 +330,5 @@
   (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (org-roam-db-autosync-mode))
 
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)
-   (C . T)))
-
-(setq org-confirm-babel-evaluate nil)
-
-(push '("conf-unix" . conf-unix) org-src-lang-modes)
-
-;; Automaticaly tangle our config.org config file when we save it
-(defun lh/org-babel-tangle-config()
-  (when (string-equal (buffer-file-name)
-                      (expand-file-name "~/Documents/Programming/emacs/config.org"))
-;; Dynamic scoping to the rescue
-(let ((org-confirm-babel-evaluate-nil))
-(org-babel-tangle))))
-
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'lh/org-babel-tangle-config)))
-
-(defun lh/lsp-mode-setup ()
-  (setq lsp-headerline-breadcrumb-enable nil))
-
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  :hook (
-         (lsp-mode . lsp-enable-which-key-integration)
-         (lsp-mode . lh/lsp-mode-setup)
-         )
-  :commands (lsp lsp-deferred))
-
-;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
-
-;; optionally if you want to use debugger
-(use-package dap-mode)
-;; (use-package dap-LANGUAGE) to load the dap adapter for your language
-
-(use-package lsp-treemacs
-  :after lsp)
-
-;; optional if you want which-key integration
-(use-package which-key
-  :config
-  (which-key-mode))
-
-(add-hook 'c-mode-hook #'lsp-deferred)
-(add-hook 'c++-mode-hook #'lsp-deferred)
-
-(add-hook 'python-mode-hook #'lsp-deferred)
-
-(use-package rustic
-  :hook (server-after-make-frame . catppuccin-reload))
-
-(use-package company
-  :after lsp-mode
-  :hook (lsp-mode . company-mode)
-  :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0.0))
-
-(use-package flycheck
-  :config
-  (add-hook 'after-init-hook #'global-flycheck-mode))
-
-(use-package projectile
-  :diminish projectile-mode
-  :init
-  (projectile-mode +1)
-  )
-
-(use-package magit
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+(use-package org-appear
+  :hook (org-mode . org-appear-mode))
