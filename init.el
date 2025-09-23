@@ -49,6 +49,9 @@
 ;; Show column in modeline
 (column-number-mode 1)
 
+;; Auto close brackets
+(electric-pair-mode 1)
+
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
   :init
@@ -203,18 +206,21 @@
   (meow-global-mode 1)
 
   (add-hook 'meow-insert-enter-hook
-	  (lambda () (setq display-line-numbers t)))
+	    (lambda ()
+	      (unless (derived-mode-p 'org-mode)
+		(setq display-line-numbers t))))
+  
 
   (add-hook 'meow-insert-exit-hook
-	  (lambda () (setq display-line-numbers 'relative)))
-  )
+	    (lambda ()
+	      (unless (derived-mode-p 'org-mode)
+	      (setq display-line-numbers 'relative)))))
 
 ;; ----------------------
 ;; Color Theme
 ;; ----------------------
 (straight-use-package 'catppuccin-theme)
 (load-theme 'catppuccin :no-confirm)
-
 
 ;; ----------------------
 ;; Magit
