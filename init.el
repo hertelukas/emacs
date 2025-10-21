@@ -240,6 +240,8 @@
 
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
 (add-hook 'rust-ts-mode-hook #'eglot-ensure)
+(add-hook 'c-mode-hook #'eglot-ensure)
+(add-hook 'c++-mode-hook #'eglot-ensure)
 
 ;; ----------------------
 ;; Completion
@@ -300,7 +302,13 @@
 (defun lh/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
+  (visual-fill-column-mode 1)
+  (set-face-attribute 'org-document-title nil :weight 'bold :height 1.5)
+  (set-face-attribute 'org-level-1 nil :height 1.5)
+  (set-face-attribute 'org-level-2 nil :height 1.4)
+  (set-face-attribute 'org-level-3 nil :height 1.3)
+  (set-face-attribute 'org-level-4 nil :height 1.2)
+  (set-face-attribute 'org-level-5 nil :height 1.1))
 
 (use-package visual-fill-column
   :hook (org-mode . lh/org-mode-visual-fill))
