@@ -216,6 +216,9 @@
 	      (unless (derived-mode-p 'org-mode)
 	      (setq display-line-numbers 'relative)))))
 
+;; tab completes
+(setq tab-always-indent 'complete)
+
 ;; ----------------------
 ;; Color Theme
 ;; ----------------------
@@ -258,6 +261,21 @@
   (vertico-mode))
 
 (use-package corfu
+  ;; TAB-and-Go customizations
+  :custom
+  (corfu-cycle t)           ;; Enable cycling for `corfu-next/previous'
+  (corfu-preselect 'prompt) ;; Always preselect the prompt
+
+  ;; Use TAB for cycling, default is `corfu-complete'.
+  :bind
+  (:map corfu-map
+        ("TAB" . corfu-next)
+	("C-j" . corfu-next)
+        ([tab] . corfu-next)
+        ("S-TAB" . corfu-previous)
+        ("C-k" . corfu-previous)
+        ([backtab] . corfu-previous))
+
   :init
   (global-corfu-mode))
 
