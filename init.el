@@ -299,6 +299,15 @@
 
 (use-package yasnippet-snippets
   :after yasnippet)
+
+(setq flymake-show-diagnostics-at-end-of-line 1)
+
+(use-package flymake
+  :config
+  (setq flymake-error-bitmap   '(vertical-bar compilation-error)
+        flymake-warning-bitmap '(vertical-bar compilation-warning)
+        flymake-note-bitmap    '(vertical-bar compilation-info)))
+
 ;; ----------------------
 ;; Org Mode
 ;; ----------------------
