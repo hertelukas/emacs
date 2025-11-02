@@ -68,6 +68,7 @@
     (define-key keymap (kbd "v") #'split-window-right)
     (define-key keymap (kbd "c") #'delete-window)
     (define-key keymap (kbd "o") #'delete-other-windows)
+    (define-key keymap (kbd "x") #'window-swap-states)
     keymap))
 
 ;; define an alias for your keymap
@@ -231,21 +232,44 @@
 (straight-use-package 'magit)
 
 ;; ----------------------
-;; LSP
+;; LSP + Tree-sitter
 ;; ----------------------
+
+;; Use Eglot as the LSP client
 (straight-use-package 'eglot)
 
+;; Automatically install and activate tree-sitter grammars
+(straight-use-package 'treesit-auto)
+
+(require 'treesit-auto)
+(setq treesit-auto-install 'prompt) ; ask before auto-installing missing grammars
+
+;; Reliable language source list (with explicit entry points)
 (setq treesit-language-source-alist
-      '((rust "https://github.com/tree-sitter/tree-sitter-rust")))
+      '((c     "https://github.com/tree-sitter/tree-sitter-c")
+        (c++   "https://github.com/tree-sitter/tree-sitter-cpp")
+        (rust  "https://github.com/tree-sitter/tree-sitter-rust")))
 
-(unless (treesit-language-available-p 'rust)
-  (treesit-install-language-grammar 'rust))
+;; Enable treesit-auto for supported modes
+(global-treesit-auto-mode)
 
-(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
-(add-hook 'rust-ts-mode-hook #'eglot-ensure)
-(add-hook 'c-mode-hook #'eglot-ensure)
-(add-hook 'c++-mode-hook #'eglot-ensure)
+;; Associate file extensions with tree-sitter modes
+(setq major-mode-remap-alist
+      '((c-mode          . c-ts-mode)
+        (c++-mode        . c++-ts-mode)
+        (rust-mode       . rust-ts-mode)
+        (c-or-c++-mode   . c-or-c++-ts-mode)))
 
+;; Automatically start Eglot for these modes
+(dolist (hook '(c-ts-mode-hook
+                c++-ts-mode-hook
+                rust-ts-mode-hook
+                c-or-c++-ts-mode-hook))
+  (add-hook hook #'eglot-ensure))
+
+;; Optional: make Eglot quieter
+(setq eglot-events-buffer-size 0)
+(setq eglot-autoshutdown t)
 ;; ----------------------
 ;; Completion
 ;; ----------------------
