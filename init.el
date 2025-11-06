@@ -82,6 +82,8 @@
     (define-key keymap (kbd "r") #'recentf)
     (define-key keymap (kbd "s") #'save-buffer)
     (define-key keymap (kbd "f") #'find-file)
+    (define-key keymap (kbd "R") #'rename-file)
+    (define-key keymap (kbd "d") #'delete-file)
     keymap))
 
 (defalias 'file-keymap file-keymap)
@@ -93,6 +95,9 @@
     (define-key keymap (kbd "D") #'eglot-find-typeDefinition)
     (define-key keymap (kbd "d") #'eglot-find-declaration)
     (define-key keymap (kbd "i") #'eglot-find-implementation)
+    (define-key keymap (kbd "r") #'eglot-rename)
+    (define-key keymap (kbd "h") #'hs-hide-block)
+    (define-key keymap (kbd "s") #'hs-show-block)
     keymap))
 
 (defalias 'eglot-keymap eglot-keymap)
@@ -270,6 +275,10 @@
 ;; Optional: make Eglot quieter
 (setq eglot-events-buffer-size 0)
 (setq eglot-autoshutdown t)
+
+;; Start hs mode to hide stuff
+(add-hook 'eglot-managed-mode-hook
+	  (lambda () (hs-minor-mode 1)))
 ;; ----------------------
 ;; Completion
 ;; ----------------------
