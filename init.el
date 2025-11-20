@@ -96,8 +96,8 @@
     (define-key keymap (kbd "d") #'eglot-find-declaration)
     (define-key keymap (kbd "i") #'eglot-find-implementation)
     (define-key keymap (kbd "r") #'eglot-rename)
-    (define-key keymap (kbd "h") #'hs-hide-block)
-    (define-key keymap (kbd "s") #'hs-show-block)
+    (define-key keymap (kbd "t") #'hs-toggle-hiding)
+    (define-key keymap (kbd "s") #'consult-imenu)
     keymap))
 
 (defalias 'eglot-keymap eglot-keymap)
@@ -202,6 +202,7 @@
    '("Y" . meow-sync-grab)
    '("z" . meow-pop-selection)
    '("'" . repeat)
+   '("?" . eldoc-box-help-at-point)
    '("<escape>" . ignore)))
 
 (use-package meow
@@ -279,6 +280,9 @@
 ;; Start hs mode to hide stuff
 (add-hook 'eglot-managed-mode-hook
 	  (lambda () (hs-minor-mode 1)))
+
+(use-package eldoc-box)
+
 ;; ----------------------
 ;; Completion
 ;; ----------------------
