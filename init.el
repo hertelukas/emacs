@@ -19,6 +19,7 @@
 
 ;; Use by default
 (setq straight-use-package-by-default t)
+
 ;; ---------------------------
 ;; General settings
 ;; ---------------------------
@@ -229,13 +230,38 @@
 ;; ----------------------
 ;; Color Theme
 ;; ----------------------
-(straight-use-package 'catppuccin-theme)
-(load-theme 'catppuccin :no-confirm)
+(use-package doom-themes
+  :ensure t
+  :custom
+  ;; Global settings (defaults)
+  (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
+  (doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  ;; for treemacs users
+  (doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  :config
+  (load-theme 'doom-ir-black t)
 
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (nerd-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 ;; ----------------------
 ;; Magit
 ;; ----------------------
-(straight-use-package 'magit)
+(use-package magit)
+
+;; ----------------------
+;; Undotree
+;; ----------------------
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode 1)
+  (setq undo-tree-history-directory-alist
+        `(("." . ,(expand-file-name "undo-tree/" user-emacs-directory)))))
 
 ;; ----------------------
 ;; LSP + Tree-sitter
@@ -282,6 +308,10 @@
 	  (lambda () (hs-minor-mode 1)))
 
 (use-package eldoc-box)
+
+(use-package hl-todo
+  :config
+  (global-hl-todo-mode 1))
 
 ;; ----------------------
 ;; Completion
@@ -416,3 +446,17 @@
 
 (use-package org-appear
   :hook (org-mode . org-appear-mode))
+
+(use-package org-roam-ui
+  :straight
+    (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+    :after org-roam
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
