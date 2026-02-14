@@ -296,7 +296,8 @@
 (dolist (hook '(c-ts-mode-hook
                 c++-ts-mode-hook
                 rust-ts-mode-hook
-                c-or-c++-ts-mode-hook))
+                c-or-c++-ts-mode-hook
+		LaTeX-mode-hook))
   (add-hook hook #'eglot-ensure))
 
 ;; Optional: make Eglot quieter
@@ -460,3 +461,21 @@
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
+
+;; ----------------------
+;; Latex
+;; ----------------------
+(use-package pdf-tools
+  :config
+  (pdf-tools-install)
+
+  (setq-default pdf-view-display-size 'fit-page)
+  (setq pdf-annot-activate-created-annotations t))
+
+(add-hook 'pdf-view-mode-hook #'(lambda () (display-line-numbers-mode -1)))
+
+(use-package auctex)
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '((latex-mode LaTeX-mode tex-mode) "texlab")))
