@@ -315,6 +315,10 @@
   :config
   (global-hl-todo-mode 1))
 
+;; Delete trailing white spaces
+(use-package ws-butler
+  :hook ((text-mode prog-mode) . ws-butler-mode))
+
 ;; ----------------------
 ;; Completion
 ;; ----------------------
