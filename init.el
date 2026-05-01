@@ -66,17 +66,15 @@
 ;; ----------------------
 ;; Window management
 ;; ----------------------
-(defvar window-keymap
-  (let ((keymap (make-keymap)))
-    (define-key keymap (kbd "w") #'other-window)
-    (define-key keymap (kbd "u") #'winner-undo)
-    (define-key keymap (kbd "r") #'winner-redo)
-    (define-key keymap (kbd "h") #'split-window-below)
-    (define-key keymap (kbd "v") #'split-window-right)
-    (define-key keymap (kbd "c") #'delete-window)
-    (define-key keymap (kbd "o") #'delete-other-windows)
-    (define-key keymap (kbd "x") #'window-swap-states)
-    keymap))
+(defvar-keymap window-keymap
+  "w" #'other-window
+  "u" #'winner-undo
+  "r" #'winner-redo
+  "h" #'split-window-below
+  "v" #'split-window-right
+  "c" #'delete-window
+  "o" #'delete-other-windows
+  "x" #'window-swap-states)
 
 ;; define an alias for your keymap
 (defalias 'window-keymap window-keymap)
@@ -84,37 +82,28 @@
 ;; ---------------------------
 ;; Modal editing: Meow
 ;; ---------------------------
-(defvar file-keymap
-  (let ((keymap (make-keymap)))
-    (define-key keymap (kbd "r") #'recentf)
-    (define-key keymap (kbd "s") #'save-buffer)
-    (define-key keymap (kbd "f") #'find-file)
-    (define-key keymap (kbd "R") #'rename-file)
-    (define-key keymap (kbd "d") #'delete-file)
-    keymap))
-
+(defvar-keymap file-keymap
+  "r" #'recentf
+  "s" #'save-buffer
+  "f" #'find-file
+  "R" #'rename-file
+  "d" #'delete-file)
 (defalias 'file-keymap file-keymap)
 
-(defvar eglot-keymap
-  (let ((keymap (make-keymap)))
-    (define-key keymap (kbd "a") #'eglot-code-actions)
-    (define-key keymap (kbd "f") #'eglot-format-buffer)
-    (define-key keymap (kbd "D") #'eglot-find-typeDefinition)
-    (define-key keymap (kbd "d") #'eglot-find-declaration)
-    (define-key keymap (kbd "i") #'eglot-find-implementation)
-    (define-key keymap (kbd "r") #'eglot-rename)
-    (define-key keymap (kbd "t") #'hs-toggle-hiding)
-    (define-key keymap (kbd "s") #'consult-imenu)
-    keymap))
-
+(defvar-keymap eglot-keymap
+  "a" #'eglot-code-actions
+  "f" #'eglot-format-buffer
+  "D" #'eglot-find-typeDefinition
+  "d" #'eglot-find-declaration
+  "i" #'eglot-find-implementation
+  "r" #'eglot-rename
+  "t" #'hs-toggle-hiding
+  "s" #'consult-imenu)
 (defalias 'eglot-keymap eglot-keymap)
 
-(defvar roam-keymap
-  (let ((keymap (make-keymap)))
-    (define-key keymap (kbd "f") #'org-roam-node-find)
-    (define-key keymap (kbd "i") #'org-roam-node-insert)
-    keymap))
-
+(defvar-keymap roam-keymap
+  "f" #'org-roam-node-find
+  "i" #'org-roam-node-insert)
 (defalias 'roam-keymap roam-keymap)
 
 (defun meow-setup ()
@@ -266,6 +255,19 @@
 (use-package vundo
   :config
   (setq vundo-glyph-alist vundo-unicode-symbols))
+
+;; ----------------------
+;; Avy (Sniper Navigation)
+;; ----------------------
+(use-package avy
+  :config
+  ;; The most versatile Avy command. It lets you type 1, 2, or 3 characters
+  ;; before triggering the jump overlay.
+  (global-set-key (kbd "C-'") #'avy-goto-char-timer))
+
+;; Add it to your Meow leader keymap for modal consistency
+(meow-leader-define-key
+ '("j" . avy-goto-char-timer))
 
 ;; ----------------------
 ;; LSP + Tree-sitter
@@ -478,7 +480,7 @@
 ;; ----------------------
 (use-package pdf-tools
   :config
-  (pdf-tools-install)
+  (pdf-loader-install)
 
   (setq-default pdf-view-display-size 'fit-page)
   (setq pdf-annot-activate-created-annotations t))
