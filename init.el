@@ -223,7 +223,7 @@
 	    (lambda ()
 	      (unless (derived-mode-p 'org-mode)
 		(setq display-line-numbers t))))
-  
+
 
   (add-hook 'meow-insert-exit-hook
 	    (lambda ()
@@ -364,7 +364,13 @@
 
 (use-package yasnippet
   :config
-  (yas-global-mode  1))
+  (yas-global-mode  1)
+
+  (define-key yas-keymap (kbd "<tab>") nil)
+  (define-key yas-keymap (kbd "TAB") nil)
+
+  (define-key yas-keymap (kbd "M-n") #'yas-next-field)
+  (define-key yas-keymap (kbd "M-p") #'yas-prev-field))
 
 (use-package yasnippet-snippets
   :after yasnippet)
