@@ -57,6 +57,12 @@
 (use-package savehist
   :init
   (savehist-mode))
+
+;; Use path
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
 ;; ----------------------
 ;; Window management
 ;; ----------------------
@@ -255,20 +261,15 @@
 (use-package magit)
 
 ;; ----------------------
-;; Undotree
+;; vundo
 ;; ----------------------
-(use-package undo-tree
+(use-package vundo
   :config
-  (global-undo-tree-mode 1)
-  (setq undo-tree-history-directory-alist
-        `(("." . ,(expand-file-name "undo-tree/" user-emacs-directory)))))
+  (setq vundo-glyph-alist vundo-unicode-symbols))
 
 ;; ----------------------
 ;; LSP + Tree-sitter
 ;; ----------------------
-
-;; Use Eglot as the LSP client
-(straight-use-package 'eglot)
 
 ;; Automatically install and activate tree-sitter grammars
 (straight-use-package 'treesit-auto)
