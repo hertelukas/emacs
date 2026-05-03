@@ -63,6 +63,8 @@
   :ensure t
   :config
   (exec-path-from-shell-initialize))
+
+(setq dired-kill-when-opening-new-dired-buffer t)
 ;; ----------------------
 ;; Window management
 ;; ----------------------
@@ -86,6 +88,7 @@
   "r" #'recentf
   "s" #'save-buffer
   "f" #'find-file
+  "F" #'consult-fd
   "R" #'rename-file
   "d" #'delete-file)
 (defalias 'file-keymap file-keymap)
@@ -136,6 +139,9 @@
    '("q q" . save-buffers-kill-terminal)
    '("/" . consult-ripgrep)
    '("?" . meow-cheatsheet)
+   '("s" . consult-line)
+   '("j" . avy-goto-char-timer)
+   '("a" . embark-act)
    )
   (meow-normal-define-key
    '("0" . meow-expand-0)
@@ -265,10 +271,6 @@
   ;; before triggering the jump overlay.
   (global-set-key (kbd "C-'") #'avy-goto-char-timer))
 
-;; Add it to your Meow leader keymap for modal consistency
-(meow-leader-define-key
- '("j" . avy-goto-char-timer))
-
 ;; ----------------------
 ;; LSP + Tree-sitter
 ;; ----------------------
@@ -388,6 +390,20 @@
   (setq flymake-error-bitmap   '(vertical-bar compilation-error)
         flymake-warning-bitmap '(vertical-bar compilation-warning)
         flymake-note-bitmap    '(vertical-bar compilation-info)))
+
+(use-package embark
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command)
+  :bind
+  (("C-." . embark-act)
+   ("C-;" . embark-dwim)))
+
+;; Bridge between Consult and Embark
+(use-package embark-consult
+  :after (embark consult)
+  :demand t
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; ----------------------
 ;; Org Mode
